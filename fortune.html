@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>เซียมซี TCAS กอดคอสอบ</title>
+    <style>
+        body {
+            font-family: 'Sarabun', sans-serif;
+            background-color: #fce4ec;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            text-align: center;
+        }
+        .container {
+            background-color: white;
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+            max-width: 400px;
+            width: 90%;
+        }
+        h1 {
+            color: #d81b60;
+            margin-bottom: 10px;
+        }
+        p.subtitle {
+            color: #555;
+            margin-bottom: 20px;
+        }
+        #result {
+            font-size: 18px;
+            color: #333;
+            background-color: #fff0f5;
+            padding: 20px;
+            border-radius: 10px;
+            margin-top: 20px;
+            min-height: 80px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border: 2px dashed #f48fb1;
+        }
+        button {
+            background-color: #e91e63;
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            font-size: 18px;
+            border-radius: 30px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+            font-weight: bold;
+        }
+        button:hover {
+            background-color: #c2185b;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h1>เซียมซี TCAS 🥠</h1>
+    <p class="subtitle">เขย่าเซียมซีเพื่อรับพลังใจก่อนลงสนามสอบ!</p>
+    <button onclick="drawFortune()">เขย่าเซียมซีเลย!</button>
+    <div id="result">ผลทำนายจะแสดงที่นี่...</div>
+</div>
+
+<script>
+    const fortunes = [
+        "ใบที่ 1: ช่วงนี้เหนื่อยหน่อยนะ แต่อย่าเพิ่งท้อ สิ่งที่น้องทำสะสมมาทุกวันกำลังจะผลิดอกออกผล ไม่ต้องวิ่งให้เร็วกว่าใคร แค่เดินให้ต่อเนื่องก็พอ!",
+        "ใบที่ 2: จักรวาลบอกว่าตอนนี้น้องตึงเกินไปแล้ว! การพักผ่อนไม่ใช่ความขี้เกียจ แต่คือการชาร์จแบตให้สมอง ปิดหนังสือสักพักแล้วค่อยลุยใหม่นะ",
+        "ใบที่ 3: มหาวิทยาลัยไม่ได้มองหาคนที่เก่งที่สุด เขามองหาคนที่พร้อมจะเรียนรู้ต่างหาก เชื่อมั่นในความยูนีคของตัวเอง กรรมการรอเห็นความเจ๋งของน้องอยู่",
+        "ใบที่ 4: ข้อสอบเก่าที่ทำผิด คือลายแทงบอกจุดอ่อน ผิดวันนี้ดีกว่าไปผิดในห้องสอบจริง หายใจเข้าลึกๆ ยิ้มรับความผิดพลาด แล้วไปต่อ!",
+        "ใบที่ 5: ความสำเร็จไม่ได้ขึ้นอยู่กับโชคชะตา แต่อยู่ที่การลงมือทำ วันนี้อ่านหนังสือเพิ่มอีกนิด พรุ่งนี้เป้าหมายจะใกล้เข้ามาอีกก้าว สู้ๆ!"
+    ];
+
+    function drawFortune() {
+        const resultDiv = document.getElementById('result');
+        resultDiv.innerHTML = "กำลังเขย่าเซียมซี... ⏳";
+        
+        // หน่วงเวลาเล็กน้อยให้ตื่นเต้น
+        setTimeout(() => {
+            const randomIndex = Math.floor(Math.random() * fortunes.length);
+            resultDiv.innerHTML = "<strong>" + fortunes[randomIndex] + "</strong>";
+        }, 800);
+    }
+</script>
+
+</body>
+</html>
