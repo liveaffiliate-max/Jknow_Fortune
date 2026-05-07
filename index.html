@@ -4,24 +4,27 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>เซียมซี TCAS กอดคอสอบ</title>
-    <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;600;700;900&family=Sarabun:wght@300;400;600&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@400;600;700;900&family=Sarabun:wght@300;400;600&display=swap" rel="stylesheet">
     <style>
         :root {
-            --red: #c0392b;
-            --gold: #f39c12;
-            --gold-light: #f9d662;
-            --dark-red: #7b1a12;
-            --cream: #fdf6e3;
-            --brown: #5d3a1a;
-            --smoke: rgba(255,255,255,0.08);
+            --green-dark:  #2d7a2d;
+            --green-mid:   #3fa83f;
+            --green-bright:#5abf5a;
+            --green-light: #7ed87e;
+            --lime:        #a8e063;
+            --yellow:      #f7e04b;
+            --yellow-deep: #e8c414;
+            --cream:       #fffde7;
+            --white:       #ffffff;
+            --text-dark:   #1b4d1b;
         }
 
         * { box-sizing: border-box; margin: 0; padding: 0; }
 
         body {
             font-family: 'Sarabun', sans-serif;
-            background: #1a0a02;
             min-height: 100vh;
+            background: linear-gradient(180deg, #c8efc8 0%, #e8f5e9 50%, #b9e6b9 100%);
             display: flex;
             flex-direction: column;
             align-items: center;
@@ -30,462 +33,315 @@
             position: relative;
         }
 
-        /* Ambient background */
-        .bg-glow {
-            position: fixed;
-            inset: 0;
-            background:
-                radial-gradient(ellipse 60% 40% at 50% 0%, rgba(192,57,43,0.25) 0%, transparent 70%),
-                radial-gradient(ellipse 40% 60% at 20% 100%, rgba(120,40,10,0.3) 0%, transparent 60%),
-                radial-gradient(ellipse 40% 60% at 80% 100%, rgba(180,90,10,0.2) 0%, transparent 60%);
-            pointer-events: none;
+        /* grass strips */
+        .grass-top, .grass-bot {
+            position: fixed; left: 0; right: 0;
+            height: 52px; pointer-events: none; z-index: 1; overflow: hidden;
+        }
+        .grass-top { top: 0; }
+        .grass-bot { bottom: 0; }
+        .grass-top svg, .grass-bot svg { width: 100%; height: 100%; }
+
+        /* floating leaves */
+        .leaves { position: fixed; inset: 0; pointer-events: none; overflow: hidden; z-index: 0; }
+        .leaf {
+            position: absolute; font-size: var(--ls,18px); opacity: 0;
+            animation: leafDrift var(--ld,8s) var(--ldelay,0s) infinite ease-in-out;
+        }
+        @keyframes leafDrift {
+            0%   { transform: translateY(110vh) rotate(0deg); opacity: 0; }
+            8%   { opacity: 0.7; }
+            90%  { opacity: 0.3; }
+            100% { transform: translateY(-10vh) rotate(var(--lrot,360deg)) translateX(var(--lx,30px)); opacity: 0; }
         }
 
-        /* Floating particles */
-        .particles { position: fixed; inset: 0; pointer-events: none; overflow: hidden; }
-        .particle {
-            position: absolute;
-            width: 3px; height: 3px;
-            background: var(--gold-light);
-            border-radius: 50%;
-            opacity: 0;
-            animation: floatUp var(--dur, 6s) var(--delay, 0s) infinite ease-in-out;
-        }
-        @keyframes floatUp {
-            0% { transform: translateY(100vh) scale(0); opacity: 0; }
-            10% { opacity: 0.8; }
-            90% { opacity: 0.3; }
-            100% { transform: translateY(-10vh) scale(1.5) translateX(var(--drift, 20px)); opacity: 0; }
+        /* fireworks canvas */
+        #fireworksCanvas {
+            position: fixed; inset: 0;
+            pointer-events: none; z-index: 200;
         }
 
+        /* wrapper */
         .wrapper {
-            position: relative;
-            z-index: 10;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            padding: 20px;
-            width: 100%;
-            max-width: 500px;
+            position: relative; z-index: 10;
+            display: flex; flex-direction: column; align-items: center;
+            padding: 24px 16px 80px; width: 100%; max-width: 480px;
         }
 
-        /* Temple header */
-        .temple-header {
+        /* header bubble */
+        .header-bubble {
+            background: linear-gradient(135deg, var(--green-dark), var(--green-mid));
+            border-radius: 50px;
+            padding: 14px 36px;
             text-align: center;
-            margin-bottom: 30px;
+            box-shadow: 0 6px 0 #1e5e1e, 0 8px 20px rgba(0,0,0,0.15);
+            margin-bottom: 28px;
+            position: relative;
         }
-
-        .temple-icon {
-            font-size: 52px;
-            display: block;
-            filter: drop-shadow(0 0 20px rgba(243,156,18,0.8));
-            animation: iconFloat 3s ease-in-out infinite;
+        .header-bubble::after {
+            content: ''; position: absolute;
+            bottom: -10px; left: 50%; transform: translateX(-50%);
+            border: 10px solid transparent;
+            border-top-color: var(--green-mid); border-bottom: none;
         }
-        @keyframes iconFloat {
-            0%, 100% { transform: translateY(0px); }
-            50% { transform: translateY(-8px); }
-        }
-
         .title {
-            font-family: 'Kanit', sans-serif;
-            font-weight: 900;
-            font-size: clamp(28px, 7vw, 42px);
-            color: var(--gold-light);
-            text-shadow: 0 0 30px rgba(243,156,18,0.6), 0 2px 0 rgba(0,0,0,0.5);
-            letter-spacing: 2px;
-            margin-top: 8px;
+            font-family: 'Kanit', sans-serif; font-weight: 900;
+            font-size: clamp(22px, 6vw, 34px);
+            color: var(--yellow);
+            text-shadow: 2px 2px 0 rgba(0,0,0,0.2);
+            letter-spacing: 1px;
         }
         .subtitle {
-            font-size: 14px;
-            color: rgba(253,246,227,0.6);
-            margin-top: 6px;
-            letter-spacing: 0.5px;
+            font-size: 13px; color: rgba(255,253,231,0.85); margin-top: 4px;
         }
 
-        /* Fortune container */
+        /* main card */
         .fortune-box {
-            width: 100%;
-            background: linear-gradient(160deg, rgba(90,30,10,0.6), rgba(30,10,5,0.8));
-            border: 1px solid rgba(243,156,18,0.3);
-            border-radius: 20px;
-            padding: 28px 24px;
-            backdrop-filter: blur(10px);
-            box-shadow:
-                0 0 40px rgba(192,57,43,0.2),
-                inset 0 1px 0 rgba(255,255,255,0.05);
-            position: relative;
-            overflow: hidden;
+            width: 100%; background: white;
+            border-radius: 28px; padding: 30px 24px 24px;
+            box-shadow: 0 8px 0 #2d8a2d, 0 12px 30px rgba(0,0,0,0.13);
+            border: 3px solid var(--green-bright); position: relative; overflow: hidden;
         }
-
         .fortune-box::before {
-            content: '';
-            position: absolute;
-            top: 0; left: 0; right: 0;
-            height: 2px;
-            background: linear-gradient(90deg, transparent, var(--gold), var(--gold-light), var(--gold), transparent);
+            content: ''; position: absolute; top: 0; left: 0; right: 0; height: 8px;
+            background: repeating-linear-gradient(90deg, var(--green-bright) 0 12px, var(--lime) 12px 20px);
         }
 
-        /* The tube container */
+        .section-label {
+            display: inline-block;
+            background: linear-gradient(135deg, var(--green-mid), var(--green-bright));
+            color: white; font-family: 'Kanit', sans-serif; font-weight: 700;
+            font-size: 13px; padding: 4px 16px; border-radius: 20px;
+            margin-bottom: 18px; box-shadow: 0 3px 0 #2a7a2a;
+        }
+
+        /* tube */
         .tube-area {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            gap: 20px;
-            margin-bottom: 24px;
+            display: flex; flex-direction: column; align-items: center;
+            gap: 16px; margin-bottom: 20px;
         }
-
         .tube-wrapper {
-            position: relative;
-            width: 100px;
-            height: 160px;
-            cursor: pointer;
+            position: relative; width: 90px; height: 150px;
+            cursor: pointer; filter: drop-shadow(0 8px 12px rgba(0,0,0,0.22));
         }
-
-        /* Bamboo tube */
         .tube {
-            position: absolute;
-            inset: 0;
+            position: absolute; inset: 0;
             background: linear-gradient(135deg, #8B6914, #5d3a1a 40%, #3d2008 70%, #6b4c15);
             border-radius: 12px 12px 8px 8px;
-            box-shadow:
-                inset -4px 0 8px rgba(0,0,0,0.4),
-                inset 4px 0 8px rgba(255,255,255,0.08),
-                0 8px 30px rgba(0,0,0,0.5);
-            transition: transform 0.1s;
+            box-shadow: inset -4px 0 8px rgba(0,0,0,0.4), inset 4px 0 8px rgba(255,255,255,0.08);
         }
-
-        /* Tube rings */
         .tube::before, .tube::after {
-            content: '';
-            position: absolute;
-            left: 50%;
-            transform: translateX(-50%);
-            width: 90%;
-            height: 10px;
-            background: linear-gradient(180deg, rgba(255,255,255,0.15), rgba(0,0,0,0.2));
+            content: ''; position: absolute; left: 50%; transform: translateX(-50%);
+            width: 88%; height: 9px;
+            background: linear-gradient(180deg, rgba(255,255,255,0.18), rgba(0,0,0,0.15));
             border-radius: 50%;
         }
-        .tube::before { top: 30px; }
-        .tube::after { top: 90px; }
-
-        /* Sticks inside */
+        .tube::before { top: 28px; }
+        .tube::after  { top: 85px; }
         .sticks {
-            position: absolute;
-            top: -15px;
-            left: 50%;
-            transform: translateX(-50%);
-            width: 70px;
-            height: 80px;
+            position: absolute; top: -14px; left: 50%;
+            transform: translateX(-50%); width: 66px; height: 75px;
         }
         .stick {
-            position: absolute;
-            bottom: 0;
-            width: 5px;
-            border-radius: 3px 3px 0 0;
+            position: absolute; bottom: 0; width: 5px; border-radius: 3px 3px 0 0;
             background: linear-gradient(180deg, #f5deb3, #d2a06a, #a0682a);
-            transform-origin: bottom center;
-            box-shadow: 1px 0 2px rgba(0,0,0,0.3);
-            transition: transform 0.3s ease;
+            transform-origin: bottom center; box-shadow: 1px 0 2px rgba(0,0,0,0.3);
         }
-
-        /* Shake animation */
-        .tube-wrapper.shaking .tube {
-            animation: shakeIt 0.6s ease-in-out;
-        }
-        .tube-wrapper.shaking .sticks {
-            animation: sticksRattle 0.6s ease-in-out;
-        }
+        .tube-wrapper.shaking .tube   { animation: shakeIt 0.65s ease-in-out; }
+        .tube-wrapper.shaking .sticks { animation: sticksRattle 0.65s ease-in-out; }
         @keyframes shakeIt {
-            0%   { transform: rotate(0deg); }
-            10%  { transform: rotate(-15deg) translateX(-5px); }
-            25%  { transform: rotate(18deg) translateX(5px); }
-            40%  { transform: rotate(-20deg) translateX(-8px); }
-            55%  { transform: rotate(22deg) translateX(6px); }
-            70%  { transform: rotate(-12deg) translateX(-4px); }
-            85%  { transform: rotate(8deg) translateX(2px); }
-            100% { transform: rotate(0deg); }
+            0%  {transform:rotate(0deg)}
+            10% {transform:rotate(-16deg) translateX(-5px)}
+            25% {transform:rotate(20deg)  translateX(5px)}
+            40% {transform:rotate(-22deg) translateX(-8px)}
+            55% {transform:rotate(24deg)  translateX(6px)}
+            70% {transform:rotate(-13deg) translateX(-4px)}
+            85% {transform:rotate(8deg)   translateX(2px)}
+            100%{transform:rotate(0deg)}
         }
         @keyframes sticksRattle {
-            0%,100% { transform: translateX(-50%) rotate(0deg); }
-            15% { transform: translateX(-55%) rotate(-10deg); }
-            35% { transform: translateX(-45%) rotate(12deg); }
-            55% { transform: translateX(-52%) rotate(-8deg); }
-            75% { transform: translateX(-48%) rotate(6deg); }
+            0%,100%{transform:translateX(-50%) rotate(0deg)}
+            15%{transform:translateX(-55%) rotate(-10deg)}
+            35%{transform:translateX(-45%) rotate(12deg)}
+            55%{transform:translateX(-52%) rotate(-8deg)}
+            75%{transform:translateX(-48%) rotate(6deg)}
         }
-
-        /* Falling stick */
-        .falling-stick {
-            position: absolute;
-            width: 5px;
-            height: 80px;
-            background: linear-gradient(180deg, #f5deb3, #d2a06a, #a0682a);
-            border-radius: 3px;
-            transform-origin: top center;
-            opacity: 0;
-            pointer-events: none;
-            z-index: 20;
-        }
-        .falling-stick.fall {
-            animation: stickFall 0.8s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards;
-        }
-        @keyframes stickFall {
-            0%   { opacity: 1; transform: rotate(0deg) translateY(0); }
-            30%  { transform: rotate(15deg) translateY(20px); }
-            70%  { transform: rotate(40deg) translateY(60px); opacity: 1; }
-            100% { transform: rotate(70deg) translateY(120px) translateX(40px); opacity: 0; }
-        }
-
         .shake-hint {
-            font-size: 12px;
-            color: rgba(253,246,227,0.45);
-            text-align: center;
-            animation: pulse 2s ease-in-out infinite;
+            font-size: 12px; color: var(--green-dark); opacity: 0.6;
+            animation: blink 2s ease-in-out infinite;
         }
-        @keyframes pulse {
-            0%, 100% { opacity: 0.45; }
-            50% { opacity: 0.9; }
-        }
+        @keyframes blink { 0%,100%{opacity:0.6} 50%{opacity:1} }
 
-        /* Btn */
+        /* button */
         .btn {
-            display: block;
-            width: 100%;
-            padding: 16px;
-            font-family: 'Kanit', sans-serif;
-            font-size: 20px;
-            font-weight: 700;
-            letter-spacing: 2px;
-            color: #1a0a02;
-            background: linear-gradient(135deg, var(--gold-light), var(--gold), #e67e22, var(--gold));
-            background-size: 300% 300%;
-            border: none;
-            border-radius: 50px;
-            cursor: pointer;
-            box-shadow: 0 4px 20px rgba(243,156,18,0.4), 0 0 40px rgba(243,156,18,0.1);
-            transition: transform 0.15s, box-shadow 0.15s;
-            animation: goldShimmer 3s ease infinite;
-            position: relative;
-            overflow: hidden;
-        }
-        @keyframes goldShimmer {
-            0%, 100% { background-position: 0% 50%; }
-            50% { background-position: 100% 50%; }
+            display: block; width: 100%; padding: 16px;
+            font-family: 'Kanit', sans-serif; font-size: 20px;
+            font-weight: 700; letter-spacing: 1px;
+            color: var(--text-dark);
+            background: linear-gradient(135deg, var(--yellow), #ffe033, var(--yellow-deep));
+            border: none; border-radius: 50px; cursor: pointer;
+            box-shadow: 0 5px 0 #b8960a, 0 8px 20px rgba(232,196,20,0.3);
+            transition: transform .12s, box-shadow .12s;
+            position: relative; overflow: hidden;
         }
         .btn::after {
-            content: '';
-            position: absolute;
-            top: 0; left: -100%;
-            width: 60%;
-            height: 100%;
-            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.4), transparent);
+            content: ''; position: absolute; top: 0; left: -100%;
+            width: 55%; height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.5), transparent);
             transform: skewX(-20deg);
-            animation: btnShine 3s 1s ease-in-out infinite;
+            animation: shine 3s .5s ease-in-out infinite;
         }
-        @keyframes btnShine {
-            0% { left: -100%; }
-            40%, 100% { left: 150%; }
-        }
-        .btn:hover { transform: translateY(-2px); box-shadow: 0 8px 30px rgba(243,156,18,0.6); }
-        .btn:active { transform: translateY(1px); }
-        .btn:disabled { opacity: 0.6; cursor: not-allowed; transform: none; }
+        @keyframes shine { 0%{left:-100%} 40%,100%{left:150%} }
+        .btn:hover  { transform: translateY(-2px); box-shadow: 0 7px 0 #b8960a, 0 12px 24px rgba(232,196,20,0.4); }
+        .btn:active { transform: translateY(3px);  box-shadow: 0 2px 0 #b8960a; }
+        .btn:disabled { opacity: .55; cursor: not-allowed; transform: none; }
 
-        /* Count badge */
+        .divider {
+            width: 100%; height: 1px;
+            background: linear-gradient(90deg, transparent, var(--green-light), transparent);
+            margin: 18px 0;
+        }
         .count-badge {
-            margin-top: 16px;
-            text-align: center;
-            font-size: 12px;
-            color: rgba(253,246,227,0.35);
+            text-align: center; font-size: 12px;
+            color: var(--green-dark); opacity: 0.6;
             font-family: 'Kanit', sans-serif;
         }
 
-        /* ===== POPUP MODAL ===== */
+        /* ── MODAL ── */
         .modal-overlay {
-            position: fixed;
-            inset: 0;
-            background: rgba(10,3,0,0.75);
-            backdrop-filter: blur(6px);
-            z-index: 100;
-            display: flex;
-            align-items: center;
-            justify-content: center;
+            position: fixed; inset: 0;
+            background: rgba(15,50,15,0.55);
+            backdrop-filter: blur(5px);
+            z-index: 300;
+            display: flex; align-items: center; justify-content: center;
             padding: 20px;
-            opacity: 0;
-            pointer-events: none;
-            transition: opacity 0.35s ease;
+            opacity: 0; pointer-events: none;
+            transition: opacity .3s ease;
         }
-        .modal-overlay.open {
-            opacity: 1;
-            pointer-events: all;
-        }
+        .modal-overlay.open { opacity: 1; pointer-events: all; }
 
         .modal-card {
             position: relative;
-            background: linear-gradient(160deg, #3b1205, #1e0900);
-            border: 1px solid rgba(243,156,18,0.45);
-            border-radius: 24px;
-            padding: 40px 28px 28px;
-            max-width: 420px;
-            width: 100%;
-            box-shadow:
-                0 0 60px rgba(192,57,43,0.35),
-                0 0 120px rgba(243,156,18,0.1),
-                inset 0 1px 0 rgba(255,255,255,0.06);
-            transform: scale(0.7) translateY(40px);
-            transition: transform 0.45s cubic-bezier(0.34, 1.56, 0.64, 1), opacity 0.35s ease;
-            opacity: 0;
+            background: white;
+            border: 4px solid var(--green-bright);
+            border-radius: 28px;
+            padding: 46px 26px 26px;
+            max-width: 400px; width: 100%;
+            box-shadow: 0 10px 0 #2a7a2a, 0 16px 40px rgba(0,0,0,0.18);
+            transform: scale(0.6) translateY(60px);
+            transition: transform .5s cubic-bezier(.34,1.56,.64,1), opacity .3s ease;
+            opacity: 0; overflow: hidden;
         }
-        .modal-overlay.open .modal-card {
-            transform: scale(1) translateY(0);
-            opacity: 1;
-        }
-
-        /* Gold top bar */
         .modal-card::before {
-            content: '';
-            position: absolute;
-            top: 0; left: 20px; right: 20px;
-            height: 2px;
-            background: linear-gradient(90deg, transparent, var(--gold), var(--gold-light), var(--gold), transparent);
-            border-radius: 2px;
+            content: ''; position: absolute; top: 0; left: 0; right: 0; height: 10px;
+            background: repeating-linear-gradient(90deg, var(--green-bright) 0 14px, var(--lime) 14px 22px);
+        }
+        .modal-overlay.open .modal-card { transform: scale(1) translateY(0); opacity: 1; }
+
+        .modal-icon {
+            position: absolute; top: -26px; left: 50%; transform: translateX(-50%);
+            font-size: 40px;
+            animation: popIn .5s cubic-bezier(.34,1.56,.64,1) .15s both;
+        }
+        @keyframes popIn {
+            0%  {transform:translateX(-50%) scale(0) rotate(-20deg)}
+            100%{transform:translateX(-50%) scale(1) rotate(0deg)}
         }
 
-        /* Stick flying out icon at top */
-        .modal-stick-icon {
-            position: absolute;
-            top: -28px;
-            left: 50%;
-            transform: translateX(-50%);
-            font-size: 36px;
-            filter: drop-shadow(0 0 12px rgba(243,156,18,0.9));
-            animation: iconBounce 0.6s cubic-bezier(0.34, 1.56, 0.64, 1) 0.2s both;
-        }
-        @keyframes iconBounce {
-            0% { transform: translateX(-50%) scale(0) rotate(-30deg); }
-            100% { transform: translateX(-50%) scale(1) rotate(0deg); }
-        }
-
-        /* Fortune number badge on modal */
         .modal-num {
             display: inline-block;
-            background: linear-gradient(135deg, var(--gold), var(--gold-light));
-            color: #1a0a02;
-            font-family: 'Kanit', sans-serif;
-            font-weight: 700;
-            font-size: 12px;
-            padding: 4px 18px;
-            border-radius: 20px;
-            letter-spacing: 2px;
-            margin-bottom: 20px;
+            background: linear-gradient(135deg, var(--green-mid), var(--green-bright));
+            color: white; font-family: 'Kanit', sans-serif; font-weight: 700;
+            font-size: 12px; padding: 5px 20px; border-radius: 20px;
+            letter-spacing: 2px; margin-bottom: 18px; box-shadow: 0 3px 0 #1e6e1e;
         }
 
-        .modal-body {
-            text-align: center;
-        }
+        .modal-body { text-align: center; }
 
         .modal-text {
-            font-size: clamp(15px, 4vw, 18px);
-            line-height: 1.85;
-            color: var(--cream);
-            font-weight: 400;
-            margin-bottom: 28px;
+            font-size: clamp(15px,4vw,17px); line-height: 1.85;
+            color: var(--text-dark); margin-bottom: 24px; font-weight: 400;
         }
 
-        /* Close button */
         .modal-close {
-            display: block;
-            width: 100%;
-            padding: 13px;
-            font-family: 'Kanit', sans-serif;
-            font-size: 16px;
-            font-weight: 600;
-            letter-spacing: 1px;
-            color: var(--gold-light);
-            background: rgba(243,156,18,0.08);
-            border: 1px solid rgba(243,156,18,0.3);
-            border-radius: 50px;
-            cursor: pointer;
-            transition: background 0.2s, transform 0.15s;
+            display: block; width: 100%; padding: 14px;
+            font-family: 'Kanit', sans-serif; font-size: 16px; font-weight: 700;
+            color: var(--text-dark);
+            background: linear-gradient(135deg, var(--yellow), #ffe033);
+            border: none; border-radius: 50px; cursor: pointer;
+            box-shadow: 0 4px 0 #b8960a;
+            transition: transform .12s, box-shadow .12s;
         }
-        .modal-close:hover {
-            background: rgba(243,156,18,0.18);
-            transform: translateY(-1px);
-        }
-        .modal-close:active { transform: translateY(1px); }
+        .modal-close:hover  { transform: translateY(-2px); }
+        .modal-close:active { transform: translateY(2px); box-shadow: 0 1px 0 #b8960a; }
 
-        /* Confetti dots inside modal */
-        .modal-confetti {
-            position: absolute;
-            inset: 0;
-            pointer-events: none;
-            border-radius: 24px;
-            overflow: hidden;
-        }
+        .modal-confetti { position: absolute; inset: 0; pointer-events: none; border-radius: 24px; overflow: hidden; }
         .conf-dot {
-            position: absolute;
-            width: 6px; height: 6px;
-            border-radius: 50%;
-            opacity: 0;
-            animation: confPop var(--cd, 0.8s) var(--cdelay, 0s) ease-out forwards;
+            position: absolute; width: 7px; height: 7px; border-radius: 50%; opacity: 0;
+            animation: confPop var(--cd,.8s) var(--cdelay,0s) ease-out forwards;
         }
         @keyframes confPop {
-            0% { transform: translate(0,0) scale(0); opacity: 1; }
-            100% { transform: translate(var(--cx), var(--cy)) scale(0.5); opacity: 0; }
-        }
-
-        /* Incense smoke */
-        .smoke-container {
-            position: absolute;
-            top: 0; left: 0; right: 0;
-            pointer-events: none;
-            height: 80px;
-            overflow: hidden;
-        }
-        .smoke-wisp {
-            position: absolute;
-            bottom: 0;
-            width: 2px;
-            background: linear-gradient(180deg, transparent, rgba(255,255,255,0.15));
-            border-radius: 50%;
-            animation: smokeDrift var(--sd, 4s) var(--sdelay, 0s) ease-in-out infinite;
-            transform-origin: bottom center;
-        }
-        @keyframes smokeDrift {
-            0% { transform: scaleX(1) translateY(0); opacity: 0; height: 0; }
-            20% { opacity: 0.6; }
-            60% { transform: scaleX(3) translateY(-40px) rotate(5deg); }
-            100% { transform: scaleX(5) translateY(-80px) rotate(-8deg); opacity: 0; height: 60px; }
-        }
-
-        /* Divider */
-        .divider {
-            width: 100%;
-            height: 1px;
-            background: linear-gradient(90deg, transparent, rgba(243,156,18,0.3), transparent);
-            margin: 20px 0;
+            0%  {transform:translate(0,0) scale(0); opacity:1}
+            100%{transform:translate(var(--cx),var(--cy)) scale(.4); opacity:0}
         }
     </style>
 </head>
 <body>
 
-<div class="bg-glow"></div>
-<div class="particles" id="particles"></div>
+<!-- Grass top -->
+<div class="grass-top">
+    <svg viewBox="0 0 1440 52" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg">
+        <rect width="1440" height="52" fill="#2d7a2d"/>
+        <ellipse cx="60"  cy="52" rx="50" ry="36" fill="#3fa83f"/>
+        <ellipse cx="190" cy="52" rx="42" ry="30" fill="#5abf5a"/>
+        <ellipse cx="310" cy="52" rx="58" ry="40" fill="#3fa83f"/>
+        <ellipse cx="460" cy="52" rx="46" ry="34" fill="#5abf5a"/>
+        <ellipse cx="600" cy="52" rx="54" ry="38" fill="#3fa83f"/>
+        <ellipse cx="750" cy="52" rx="48" ry="36" fill="#5abf5a"/>
+        <ellipse cx="900" cy="52" rx="56" ry="40" fill="#3fa83f"/>
+        <ellipse cx="1060" cy="52" rx="44" ry="32" fill="#5abf5a"/>
+        <ellipse cx="1210" cy="52" rx="52" ry="38" fill="#3fa83f"/>
+        <ellipse cx="1370" cy="52" rx="46" ry="34" fill="#5abf5a"/>
+    </svg>
+</div>
+
+<!-- Grass bottom -->
+<div class="grass-bot">
+    <svg viewBox="0 0 1440 52" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg">
+        <rect width="1440" height="52" fill="#2d7a2d"/>
+        <ellipse cx="60"  cy="0" rx="50" ry="36" fill="#3fa83f"/>
+        <ellipse cx="190" cy="0" rx="42" ry="30" fill="#5abf5a"/>
+        <ellipse cx="310" cy="0" rx="58" ry="40" fill="#3fa83f"/>
+        <ellipse cx="460" cy="0" rx="46" ry="34" fill="#5abf5a"/>
+        <ellipse cx="600" cy="0" rx="54" ry="38" fill="#3fa83f"/>
+        <ellipse cx="750" cy="0" rx="48" ry="36" fill="#5abf5a"/>
+        <ellipse cx="900" cy="0" rx="56" ry="40" fill="#3fa83f"/>
+        <ellipse cx="1060" cy="0" rx="44" ry="32" fill="#5abf5a"/>
+        <ellipse cx="1210" cy="0" rx="52" ry="38" fill="#3fa83f"/>
+        <ellipse cx="1370" cy="0" rx="46" ry="34" fill="#5abf5a"/>
+    </svg>
+</div>
+
+<div class="leaves" id="leaves"></div>
+<canvas id="fireworksCanvas"></canvas>
 
 <div class="wrapper">
-    <div class="temple-header">
-        <span class="temple-icon">🏮</span>
-        <div class="title">เซียมซี TCAS</div>
-        <div class="subtitle">เขย่าเซียมซีรับพลังใจก่อนลงสนามสอบ</div>
+    <div class="header-bubble">
+        <div class="title">🥢 เซียมซี TCAS 🥢</div>
+        <div class="subtitle">เขย่าเซียมซีรับพลังใจก่อนลงสนามสอบ!</div>
     </div>
 
     <div class="fortune-box">
-        <div class="smoke-container" id="smokeContainer"></div>
+        <div style="text-align:center">
+            <span class="section-label">🌿 กระบอกเซียมซีวิเศษ 🌿</span>
+        </div>
 
         <div class="tube-area">
             <div class="tube-wrapper" id="tubeWrapper" onclick="handleShake()" title="คลิกเพื่อเขย่า">
                 <div class="tube"></div>
                 <div class="sticks" id="sticks"></div>
             </div>
-            <div class="shake-hint" id="shakeHint">👆 คลิกที่กระบอกเพื่อเขย่า หรือ</div>
+            <div class="shake-hint" id="shakeHint">👆 คลิกกระบอก หรือกดปุ่มด้านล่าง</div>
         </div>
 
         <button class="btn" id="mainBtn" onclick="drawFortune()">🥢 เขย่าเซียมซีเลย!</button>
@@ -499,11 +355,11 @@
 <div class="modal-overlay" id="modalOverlay" onclick="closeModal(event)">
     <div class="modal-card" id="modalCard">
         <div class="modal-confetti" id="modalConfetti"></div>
-        <div class="modal-stick-icon">🥢</div>
+        <div class="modal-icon">🌟</div>
         <div class="modal-body">
             <div class="modal-num" id="modalNum">ใบที่ ๑</div>
             <p class="modal-text" id="modalText"></p>
-            <button class="modal-close" onclick="closeModalDirect()">✨ รับพลัง แล้วลุยเลย!</button>
+            <button class="modal-close" onclick="closeModalDirect()">🌿 รับพลัง แล้วลุยเลย! 🌿</button>
         </div>
     </div>
 </div>
@@ -564,91 +420,124 @@ const fortunes = [
 ];
 
 const fortuneNums = [
-    "ซีที่ ๑","ซีที่ ๒","ซีที่ ๓","ซีที่ ๔","ซีที่ ๕",
-    "ซีที่ ๖","ซีที่ ๗","ซีที่ ๘","ซีที่ ๙","ซีที่ ๑๐"
+    "ใบที่ ๑","ใบที่ ๒","ใบที่ ๓","ใบที่ ๔","ใบที่ ๕",
+    "ใบที่ ๖","ใบที่ ๗","ใบที่ ๘","ใบที่ ๙","ใบที่ ๑๐",
+    "ใบที่ ๑๑","ใบที่ ๑๒","ใบที่ ๑๓","ใบที่ ๑๔","ใบที่ ๑๕",
+    "ใบที่ ๑๖","ใบที่ ๑๗","ใบที่ ๑๘","ใบที่ ๑๙","ใบที่ ๒๐",
+    "ใบที่ ๒๑","ใบที่ ๒๒","ใบที่ ๒๓","ใบที่ ๒๔","ใบที่ ๒๕",
+    "ใบที่ ๒๖","ใบที่ ๒๗","ใบที่ ๒๘","ใบที่ ๒๙","ใบที่ ๓๐",
+    "ใบที่ ๓๑","ใบที่ ๓๒","ใบที่ ๓๓","ใบที่ ๓๔","ใบที่ ๓๕",
+    "ใบที่ ๓๖","ใบที่ ๓๗","ใบที่ ๓๘","ใบที่ ๓๙","ใบที่ ๔๐",
+    "ใบที่ ๔๑","ใบที่ ๔๒","ใบที่ ๔๓","ใบที่ ๔๔","ใบที่ ๔๕",
+    "ใบที่ ๔๖","ใบที่ ๔๗","ใบที่ ๔๘","ใบที่ ๔๙","ใบที่ ๕๐",
+    "ใบที่ ๕๑"
 ];
 
-let isAnimating = false;
-let shakeCount = 0;
-let lastIndex = -1;
+/* ── STATE ── */
+let isAnimating = false, shakeCount = 0, lastIndex = -1;
 
-// Build particles
-const particlesEl = document.getElementById('particles');
-for (let i = 0; i < 30; i++) {
-    const p = document.createElement('div');
-    p.className = 'particle';
-    p.style.cssText = `left:${Math.random()*100}%; --dur:${4+Math.random()*8}s; --delay:${Math.random()*8}s; --drift:${(Math.random()-0.5)*60}px;`;
-    particlesEl.appendChild(p);
+/* ── LEAVES ── */
+const leavesEl   = document.getElementById('leaves');
+const leafEmojis = ['🍃','🌿','🍀','☘️'];
+for (let i = 0; i < 18; i++) {
+    const l = document.createElement('div');
+    l.className   = 'leaf';
+    l.textContent = leafEmojis[Math.floor(Math.random()*leafEmojis.length)];
+    l.style.cssText = `left:${Math.random()*100}%;--ls:${12+Math.random()*12}px;--ld:${6+Math.random()*10}s;--ldelay:${Math.random()*10}s;--lrot:${Math.random()*720-360}deg;--lx:${(Math.random()-0.5)*80}px;`;
+    leavesEl.appendChild(l);
 }
 
-// Build sticks inside tube
+/* ── STICKS ── */
 const sticksEl = document.getElementById('sticks');
-const stickData = [
-    {left:'15%', height:'65px', rot:'-12deg'},
-    {left:'28%', height:'72px', rot:'-4deg'},
-    {left:'40%', height:'68px', rot:'2deg'},
-    {left:'52%', height:'75px', rot:'8deg'},
-    {left:'64%', height:'63px', rot:'15deg'},
-    {left:'76%', height:'70px', rot:'-6deg'},
-];
-stickData.forEach(d => {
+[{l:'12%',h:'62px',r:'-14deg'},{l:'27%',h:'70px',r:'-4deg'},
+ {l:'41%',h:'66px',r:'3deg'}, {l:'55%',h:'73px',r:'9deg'},
+ {l:'68%',h:'60px',r:'16deg'},{l:'80%',h:'68px',r:'-7deg'}]
+.forEach(d => {
     const s = document.createElement('div');
     s.className = 'stick';
-    s.style.cssText = `left:${d.left};height:${d.height};transform:rotate(${d.rot});`;
+    s.style.cssText = `left:${d.l};height:${d.h};transform:rotate(${d.r});`;
     sticksEl.appendChild(s);
 });
 
-// Build smoke wisps
-const smokeEl = document.getElementById('smokeContainer');
-for (let i = 0; i < 4; i++) {
-    const w = document.createElement('div');
-    w.className = 'smoke-wisp';
-    w.style.cssText = `left:${20+i*18}%; --sd:${3+i*0.8}s; --sdelay:${i*0.6}s;`;
-    smokeEl.appendChild(w);
-}
+/* ── FIREWORKS ENGINE ── */
+const canvas = document.getElementById('fireworksCanvas');
+const ctx    = canvas.getContext('2d');
+let fwParts  = [], fwRaf = null, fwStopAt = 0;
 
-function handleShake() {
-    if (isAnimating) return;
-    drawFortune();
-}
+function resizeCanvas() { canvas.width = innerWidth; canvas.height = innerHeight; }
+resizeCanvas();
+window.addEventListener('resize', resizeCanvas);
 
-function spawnConfetti() {
-    const confetti = document.getElementById('modalConfetti');
-    confetti.innerHTML = '';
-    const colors = ['#f9d662','#f39c12','#e74c3c','#ff6b6b','#fff','#ffd700'];
-    for (let i = 0; i < 20; i++) {
-        const dot = document.createElement('div');
-        dot.className = 'conf-dot';
-        const angle = Math.random() * Math.PI * 2;
-        const dist = 80 + Math.random() * 120;
-        dot.style.cssText = `
-            left: ${20 + Math.random()*60}%;
-            top: ${20 + Math.random()*60}%;
-            background: ${colors[Math.floor(Math.random()*colors.length)]};
-            --cx: ${Math.cos(angle)*dist}px;
-            --cy: ${Math.sin(angle)*dist}px;
-            --cd: ${0.5 + Math.random()*0.6}s;
-            --cdelay: ${Math.random()*0.3}s;
-        `;
-        confetti.appendChild(dot);
+const FW_COLORS = ['#f7e04b','#5abf5a','#a8e063','#fff','#ff7675','#7ed87e','#ffe033','#b5f57a','#74b9ff','#fd79a8'];
+
+function launchBurst() {
+    const x = Math.random()*canvas.width;
+    const y = Math.random()*canvas.height*0.55 + 30;
+    const color = FW_COLORS[Math.floor(Math.random()*FW_COLORS.length)];
+    const n = 55 + Math.floor(Math.random()*35);
+    for (let i = 0; i < n; i++) {
+        const a = (Math.PI*2/n)*i + (Math.random()-.5)*.3;
+        const sp = 2.5 + Math.random()*4.5;
+        fwParts.push({ x, y, vx: Math.cos(a)*sp, vy: Math.sin(a)*sp,
+            alpha:1, color, r: 2+Math.random()*2.2,
+            decay: .011+Math.random()*.012, g: .055 });
     }
 }
 
+function fwLoop() {
+    ctx.clearRect(0,0,canvas.width,canvas.height);
+    for (const p of fwParts) {
+        p.x += p.vx; p.y += p.vy; p.vy += p.g;
+        p.vx *= .97;  p.alpha -= p.decay;
+        ctx.globalAlpha = Math.max(0, p.alpha);
+        ctx.fillStyle = p.color;
+        ctx.beginPath(); ctx.arc(p.x, p.y, p.r, 0, Math.PI*2); ctx.fill();
+    }
+    ctx.globalAlpha = 1;
+    fwParts = fwParts.filter(p => p.alpha > 0);
+    if (fwParts.length > 0 || Date.now() < fwStopAt)
+        fwRaf = requestAnimationFrame(fwLoop);
+    else ctx.clearRect(0,0,canvas.width,canvas.height);
+}
+
+function startFireworks(duration, onDone) {
+    fwParts  = [];
+    fwStopAt = Date.now() + duration;
+    launchBurst();
+    const iv = setInterval(() => {
+        if (Date.now() < fwStopAt) launchBurst();
+        else { clearInterval(iv); setTimeout(onDone, 350); }
+    }, 200);
+    if (fwRaf) cancelAnimationFrame(fwRaf);
+    fwRaf = requestAnimationFrame(fwLoop);
+}
+
+/* ── MODAL CONFETTI ── */
+function spawnConfetti() {
+    const el = document.getElementById('modalConfetti');
+    el.innerHTML = '';
+    const cols = ['#f7e04b','#5abf5a','#a8e063','#3fa83f','#ffe033','#b5f57a','#ff9f43'];
+    for (let i = 0; i < 24; i++) {
+        const d = document.createElement('div');
+        d.className = 'conf-dot';
+        const a = Math.random()*Math.PI*2, dist = 70+Math.random()*130;
+        d.style.cssText = `left:${10+Math.random()*80}%;top:${10+Math.random()*80}%;background:${cols[Math.floor(Math.random()*cols.length)]};--cx:${Math.cos(a)*dist}px;--cy:${Math.sin(a)*dist}px;--cd:${.5+Math.random()*.7}s;--cdelay:${Math.random()*.25}s;`;
+        el.appendChild(d);
+    }
+}
+
+/* ── MODAL ── */
 function openModal(text, numLabel) {
     document.getElementById('modalText').textContent = text;
-    document.getElementById('modalNum').textContent = `🥢 ${numLabel}`;
+    document.getElementById('modalNum').textContent  = `🌿 ${numLabel}`;
     document.getElementById('modalOverlay').classList.add('open');
     spawnConfetti();
 }
-
 function closeModal(e) {
-    // only close if clicking the overlay backdrop itself
     if (e.target === document.getElementById('modalOverlay')) closeModalDirect();
 }
-
 function closeModalDirect() {
-    const overlay = document.getElementById('modalOverlay');
-    overlay.classList.remove('open');
+    document.getElementById('modalOverlay').classList.remove('open');
     setTimeout(() => {
         document.getElementById('mainBtn').disabled = false;
         document.getElementById('shakeHint').style.opacity = '';
@@ -656,39 +545,37 @@ function closeModalDirect() {
     }, 350);
 }
 
+/* ── MAIN ── */
+function handleShake() { if (!isAnimating) drawFortune(); }
+
 function drawFortune() {
     if (isAnimating) return;
     isAnimating = true;
 
-    const btn = document.getElementById('mainBtn');
+    const btn  = document.getElementById('mainBtn');
     const tube = document.getElementById('tubeWrapper');
     const hint = document.getElementById('shakeHint');
 
     btn.disabled = true;
     hint.style.opacity = '0';
-
-    // Shake tube
     tube.classList.add('shaking');
 
     setTimeout(() => {
         tube.classList.remove('shaking');
 
-        // Pick fortune (avoid repeat)
         let idx;
-        do { idx = Math.floor(Math.random() * fortunes.length); }
+        do { idx = Math.floor(Math.random()*fortunes.length); }
         while (idx === lastIndex && fortunes.length > 1);
         lastIndex = idx;
-
         shakeCount++;
-        const numLabel = fortuneNums[Math.floor(Math.random() * fortuneNums.length)];
 
         document.getElementById('countBadge').textContent =
             `เขย่าแล้ว ${shakeCount} ครั้ง · โชคดีทุกคนนะ 🙏`;
 
-        // Open popup
-        openModal(fortunes[idx], numLabel);
+        // 🎆 Fireworks → then popup
+        startFireworks(1400, () => openModal(fortunes[idx], fortuneNums[idx]));
 
-    }, 750);
+    }, 700);
 }
 </script>
 </body>
